@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"net"
 	"strconv"
@@ -93,41 +92,43 @@ func solveProblem(problemString string) int {
 }
 
 func main() {
-conn, err := net.Dial("tcp", "offsec-chalbroker.osiris.cyber.nyu.edu:1236")
-if err != nil {
-fmt.Println("dial error:", err)
-return
-}
-defer conn.Close()
-//n, err :=fmt.Fprintf(conn, "pk1898\r\n")
-var buf bytes.Buffer
-b := []byte("pk1898\n")
-//curMessage := make([]byte, 0)
-curMessageBuff := make([]byte, 4096)
-n, err := conn.Read(curMessageBuff)
-fmt.Println(n)
-fmt.Println(string(curMessageBuff))
-conn.Write(b)
-time.Sleep(2 * time.Second)
-n, err = conn.Read(curMessageBuff)
-fmt.Println(n)
-fmt.Println(string(curMessageBuff))
-stringQuestion := strings.SplitAfter(string(curMessageBuff), "\n")
-question := stringQuestion[4]
-answer := solveProblem(question)
-b = []byte(strconv.Itoa(answer) + "\n")
-conn.Write(b)
-for {
-	curMessageBuff = make([]byte, 4096)
+	conn, err := net.Dial("tcp", "offsec-chalbroker.osiris.cyber.nyu.edu:1236")
+	if err != nil {
+	fmt.Println("dial error:", err)
+	return
+	}
+	defer conn.Close()
+	//n, err :=fmt.Fprintf(conn, "pk1898\r\n")
+	b := []byte("pk1898\n")
+	//curMessage := make([]byte, 0)
+	curMessageBuff := make([]byte, 4096)
+	n, err := conn.Read(curMessageBuff)
+	fmt.Println(n)
+	fmt.Println(string(curMessageBuff))
+	conn.Write(b)
+	time.Sleep(1000 * time.Millisecond)
 	n, err = conn.Read(curMessageBuff)
 	fmt.Println(string(curMessageBuff))
-	stringQuestion = strings.SplitAfter(string(curMessageBuff), "\n")
-	question = stringQuestion[1]
+	stringQuestion := strings.SplitAfter(string(curMessageBuff), "\n")
+	question := stringQuestion[4]
 	answer := solveProblem(question)
+	fmt.Println(answer, "\n")
 	b = []byte(strconv.Itoa(answer) + "\n")
 	conn.Write(b)
-	fmt.Println(string(curMessageBuff))
-}
 
-fmt.Println("total size:", buf.Len())
+	for len(stringQuestion) > 1 {
+		curMessageBuff = make([]byte, 4096)
+		n, err = conn.Read(curMessageBuff)
+		fmt.Println(string(curMessageBuff))
+		stringQuestion = strings.SplitAfter(string(curMessageBuff), "\n")
+		if len(stringQuestion) > 1 {
+			question = stringQuestion[1]
+			answer := solveProblem(question)
+			fmt.Println(answer, "\n")
+			b = []byte(strconv.Itoa(answer) + "\n")
+			conn.Write(b)
+			fmt.Println(string(curMessageBuff))
+		}
+	}
+
 }
