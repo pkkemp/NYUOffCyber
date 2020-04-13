@@ -10,11 +10,11 @@ global_timeout = 5 #seconds
 
 #challenge-specific info
 host = 'offsec-chalbroker.osiris.cyber.nyu.edu'
-port = 1246
-netid='adp369'
+port = 1345
+netid='pk1898'
 
 do_remote = False
-binary_name = './numerix'
+binary_name = './heaplang'
 
 #for doing local debugging
 is_local_dbg = False
