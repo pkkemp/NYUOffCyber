@@ -1,23 +1,4 @@
-import itertools
-import string
-
-def single_byte_xor(plaintext, key):
-    if len(key) != 1:
-      raise Exception("KEY LENGTH EXCEPTION: In single_byte_xor key must be 1 byte long!")
-    return xor(plaintext, key*len(plaintext))
-
-
-def xor(str1, str2):
-    if len(str1) != len(str2):
-        raise Exception("XOR EXCEPTION: Strings are not of equal length!")
-    s1 = bytearray(str1)
-    s2 = bytearray(str2)
-
-    result = bytearray()
-    for i in range(len(s1)):
-        result.append(s1[i] ^ s2[i])
-
-    return str(result)
+import string, itertools
 
 
 def has_nonprintable_characters(text):
@@ -90,87 +71,10 @@ def has_english_words(text):
     return False
 
 
-def is_english(input_text):
-    text = input_text.lower()
-
-    if has_nonprintable_characters(text):
-        return False
-
-    # If the text contains one of the most frequent english words
-    # it is very likely that it's an english text
-    if has_english_words(text):
-        return True
-
-    if not has_vowels(text):
-        return False
-
-    if has_forbidden_digraphs(text):
-        return False
-
-    if not has_necessary_percentage_frequent_characters(text):
-        return False
-
-    if not has_necessary_percentage_punctuation(text):
-        return False
-
-    return True
-
-def repeating_key_xor(plaintext, key):
-    if len(key) == 0 or len(key) > len(plaintext):
-        raise Exception("KEY LENGTH EXCEPTION!")
-
-    ciphertext_bytes = bytearray()
-    plaintext_bytes = bytearray(plaintext)
-    key_bytes = bytearray(key)
-
-    # XOR every byte of the plaintext with the corresponding byte from the key
-    for i in range(len(plaintext)):
-        k = key_bytes[i % len(key)]
-        c = plaintext_bytes[i] ^ k
-        ciphertext_bytes.append(c)
-
-    return str(ciphertext_bytes)
-
-
 def hamming_distance(str1, str2):
     result = xor(str1, str2)
 
     return bin(int(result.encode('hex'), 16)).count('1')
-
-
-def find_xor_keysize(ciphertext, hamming_blocks, minsize=2, maxsize=10):
-    hamming_dict = {}  # <keysize> : <hamming distance>
-
-    if (hamming_blocks * maxsize) > len(ciphertext):
-        raise Exception("OUT OF BOUND EXCEPTION! Lower the hamming_blocks or the key maxsize!")
-
-    for key_length in range(minsize, maxsize):
-        # Take the first 'hamming_blocks' blocks
-        # with size key_length bytes
-        blocks = []
-        for i in range(hamming_blocks):
-            blocks.append(ciphertext[i * key_length: (i + 1) * key_length])
-
-        # Calculate the hamming distance between the blocks
-        # (first,second) ; (first,third) ; (first,fourth)
-        # (second, third) ; (second, fourth)
-        # (third, fourth) ; There are sum(1,hamming_blocks-1) combinations
-        hd = []  # hamming distance
-        for i in range(hamming_blocks - 1):
-            for j in range(i + 1, hamming_blocks):
-                hd.append(hamming_distance(blocks[i], blocks[j]))
-
-        hd_average = float(sum(hd)) / len(hd)
-        hd_normalized = hd_average / key_length
-
-        hamming_dict[key_length] = hd_normalized
-
-    # Get sorted (ascending order) list of tuples. Sorted by dictionary value (i.e. hamming distance)
-    sorted_list_tuples = sorted(hamming_dict.items(), key=lambda x: x[1])
-
-    # One of the three keys that produced the lowest hamming distance
-    # is likely the actual size
-    return [sorted_list_tuples[0][0], sorted_list_tuples[1][0], sorted_list_tuples[2][0]]
 
 
 def divide_text_by_blocks(text, block_size):
@@ -266,6 +170,117 @@ def break_repeat_key_xor(ciphertext):
                 raw_input()
                 print
                 "=================="
+
+def find_xor_keysize(ciphertext, hamming_blocks, minsize=2, maxsize=10):
+    hamming_dict = {}  # <keysize> : <hamming distance>
+
+    if (hamming_blocks * maxsize) > len(ciphertext):
+        raise "OUT OF BOUND EXCEPTION! Lower the hamming_blocks or the key maxsize!"
+
+    for key_length in range(minsize, maxsize):
+        # Take the first 'hamming_blocks' blocks
+        # with size key_length bytes
+        blocks = []
+        for i in range(hamming_blocks):
+            blocks.append(ciphertext[i * key_length: (i + 1) * key_length])
+
+        # Calculate the hamming distance between the blocks
+        # (first,second) ; (first,third) ; (first,fourth)
+        # (second, third) ; (second, fourth)
+        # (third, fourth) ; There are sum(1,hamming_blocks-1) combinations
+        hd = []  # hamming distance
+        for i in range(hamming_blocks - 1):
+            for j in range(i + 1, hamming_blocks):
+                hd.append(hamming_distance(blocks[i], blocks[j]))
+
+        hd_average = float(sum(hd)) / len(hd)
+        hd_normalized = hd_average / key_length
+
+        hamming_dict[key_length] = hd_normalized
+
+    # Get sorted (ascending order) list of tuples. Sorted by dictionary value (i.e. hamming distance)
+    sorted_list_tuples = sorted(hamming_dict.items(), key=lambda x: x[1])
+
+    # One of the three keys that produced the lowest hamming distance
+    # is likely the actual size
+    return [sorted_list_tuples[0][0], sorted_list_tuples[1][0], sorted_list_tuples[2][0]]
+
+
+def repeating_key_xor(plaintext, key):
+    if len(key) == 0 or len(key) > len(plaintext):
+        raise "KEY LENGTH EXCEPTION!"
+
+    ciphertext_bytes = bytearray()
+    plaintext_bytes = bytearray(plaintext)
+    key_bytes = bytearray(key)
+
+    # XOR every byte of the plaintext with the corresponding byte from the key
+    for i in range(len(plaintext)):
+        k = key_bytes[i % len(key)]
+        c = plaintext_bytes[i] ^ k
+        ciphertext_bytes.append(c)
+
+    return str(ciphertext_bytes)
+
+
+def break_single_byte_xor(ciphertext):
+    keys = []
+    plaintext = []
+
+    for key in range(256):
+        text = single_byte_xor(ciphertext, chr(key))
+        if is_english(text):
+            keys.append(chr(key))
+            plaintext.append(text)
+
+    # There might be more than one string that match the rules of the is_english function.
+    # Return all those strings and their corresponding keys and inspect visually to
+    # determine which is the correct plaintext.
+    return keys, plaintext
+
+
+def is_english(input_text):
+    text = input_text.lower()
+
+    if has_nonprintable_characters(text):
+        return False
+
+    # If the text contains one of the most frequent english words
+    # it is very likely that it's an english text
+    if has_english_words(text):
+        return True
+
+    if not has_vowels(text):
+        return False
+
+    if has_forbidden_digraphs(text):
+        return False
+
+    if not has_necessary_percentage_frequent_characters(text):
+        return False
+
+    if not has_necessary_percentage_punctuation(text):
+        return False
+
+    return True
+
+
+def xor(str1, str2):
+    if len(str1) != len(str2):
+        raise "XOR EXCEPTION: Strings are not of equal length!"
+    s1 = bytearray(str1)
+    s2 = bytearray(str2)
+
+    result = bytearray()
+    for i in range(len(s1)):
+        result.append(s1[i] ^ s2[i])
+
+    return str(result)
+
+def single_byte_xor(plaintext, key):
+    if len(key) != 1:
+      raise "KEY LENGTH EXCEPTION: In single_byte_xor key must be 1 byte long!"
+    return xor(plaintext, key*len(plaintext))
 
 def main():
     msg = '''In today's electronic communication forums, encryption can be very
