@@ -13,7 +13,7 @@ In order to get to a challenge that was _actually_ difficult, I had to complete 
     2. We are also given a variable called "key" which is `meownyameownyameownyameownyameownya`
     2. The flag was more than just encoded though, there was a function called "woah" that did the following: 
     ```python
-    def woah(s1,s2): #part of pass 3
+    def woah(s1,s2):
         return ''.join(chr(ord(a) ^ ord(b)) for a,b in zip(s1,s2))
     ```
     the ^ symbol in Python is used to bitwise XOR two operands. This is pretty clearly just XORing the input of s1 and s2 (the key and the user's input) charcter by character.
@@ -40,7 +40,7 @@ In order to get to a challenge that was _actually_ difficult, I had to complete 
     main()
     ```
 
-    4. Bingo! We got the flag `rtcp{y0u_L3fT_y0uR_x0r_K3y_bEh1nD!}`
+    Bingo! We got the flag `rtcp{y0u_L3fT_y0uR_x0r_K3y_bEh1nD!}`
 
 
 ## The Problem
