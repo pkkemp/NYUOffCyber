@@ -44,3 +44,5 @@ In order to get to a challenge that was _actually_ difficult, I had to complete 
 
 
 ## The Problem
+
+The main challenege that we're focsused on solving here is much harder reversing challenege than those discussed in the Other Challenges section above.

@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class reverse_tough
 {
@@ -11,20 +10,61 @@ public class reverse_tough
     public static HashMap<Integer, Character> theflags2 = new HashMap<>();
     public static boolean m = true;
     public static boolean g = false;
-    
-    public static void main(String args[]) {
-        check();
-    }
-    public static boolean check(){
 
-        String originalFlag = "\u009D\u009DíÓÚ¢Ö¦¥Î\u0091f\u008FÇ¦á«ÀÖÑÎ«¥Ó";
-        //String originalFlag = "ì¨ ¢«¢¥Ç©© ÂëÏãÒËãhÔÊ";
-        for(int p = 0; p < originalFlag.length(); p++){
-            if(true){
-                originalFlag = originalFlag.substring(0,p) + (char)((int)(originalFlag.charAt(p)-10)) + originalFlag.substring(p+1);
+    public static void main() {
+        int[] unicode = {157, 157, 236, 168, 160, 162, 171, 162, 165, 199, 169, 169, 160, 194, 235, 207, 227, 210, 157, 203, 227, 104, 212, 202};
+        String thefinalflag = "";
+        String flag = "ow0_wh4t_4_h4ckr_y0u_4r3";
+        createMap(theflags0, flag, g);
+        createMap(theflags2, flag, m);
+        char[] output = new char[24];
+        String theflag = "";
+
+        for (int i = 0; i < unicode.length; i++) {
+            if (unicode[i] > 155 && unicode[i] < 167) {
+                thefinalflag += (char)(unicode[i]-10);
+            } else {
+                thefinalflag += (char)(unicode[i]);
             }
         }
-        return true;
+        for (int i = thefinalflag.length()-1; i >= 0; i--) {
+            theflag = (char)(((int)thefinalflag.charAt(i))-((int)theflags0.get(i))) + theflag;
+        }
+        for (int i = theflag.length()-1; i >= theflag.length()-3; i--) {
+            theflags1.put(i, theflag.charAt(i));
+        }
+        for (int i = theflag.length()-4; i >= 0; i--) {
+            theflags.put(i, theflag.charAt(i));
+        }
+        for (int i = 0; i < 24; i++) {
+            if (realflag[i] < 21) {
+                output[i] = theflags.get(realflag[i]);
+            }
+        }
+        for (int i = 0; i < 24; i++) {
+            if (therealflag[i] > 20) {
+                output[i] = theflags1.get(therealflag[i]);
+            }
+        }
+
+        output[output.length-2] = 'o';
+        output[2] = 'r';
+        output[3] = '3';
+        output[5] = '_';
+        output[7] = '_';
+
+        System.out.println(new String(output));
     }
 
+    public static void createMap(HashMap owo, String input, boolean uwu){
+        if(uwu){
+            for(int i = 0; i < input.length(); i++){
+                owo.put(realflag[i],input.charAt(i));
+            }
+        } else{
+            for(int i = 0; i < input.length(); i++){
+                owo.put(therealflag[i],input.charAt(i));
+            }
+        }
+    }
 }
