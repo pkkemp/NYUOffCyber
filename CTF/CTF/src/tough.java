@@ -16,6 +16,8 @@ public class tough
         //System.out.print("Enter flag: ");
         //String userInput = scanner.next();
         String flag = "ow0_wh4t_4_h4ckr_y0u_4r3";
+        char[] decon = "ì¨ ¢«¢¥Ç©© ÂëÏãÒËãhÔÊ".toCharArray();
+        char[] finalflag = "h3r3s_4_c0stly_fl4g_4you".toCharArray();
         String userInput = formatFlag(solveTough(flag));
         System.out.println(userInput);
         String input = userInput.substring("rtcp{".length(),userInput.length()-1);
@@ -25,60 +27,7 @@ public class tough
             System.out.println("Access denied!");
         }
     }
-    public static void printflags() {
-        String tempstring = "";
-        for(int i = 0; i < realflag.length; i++) {
-            tempstring += (char)realflag[i];
-        }
-        System.out.println(tempstring);
-        tempstring = "";
-        for(int i = 0; i < therealflag.length; i++) {
-            tempstring += (char)realflag[i];
-        }
-        System.out.println(tempstring);
 
-    }
-    public static void deMap(){
-        String input = "ì¨ ¢«¢¥Ç©© ÂëÏãÒËãhÔÊ";
-        String key = "ow0_wh4t_4_h4ckr_y0u_4r3";
-        createMap(theflags, input, m);
-        createMap(theflags0, key, g);
-        createMap(theflags1, input, g);
-        createMap(theflags2, key, m);
-        String flag = "ì¨ ¢«¢¥Ç©© ÂëÏãÒËãhÔÊ";
-        String comp = " áÓÚ¢ðÇ¥Îg¢¦¢ÚÖ¾£hêÖ";
-
-        char[] ch = new char[input.length()];
-
-        // Copy character by character into array
-        for (int i = 0; i < input.length(); i++) {
-
-            ch[i] = input.charAt(i);
-            if (input.charAt(i)>156 && input.charAt(i)<167)
-            {
-                ch[i] = (char) (input.charAt(i)-10);
-            }
-        }
-        String thefinalflag = "";
-        String flag2 = new String(ch);
-
-        for(int p = 0; p < flag2.length(); p++){
-            thefinalflag += (char)((int)(theflags0.get(p)) - (int)(flag2.charAt(p)));
-        }
-
-        String theflag = thefinalflag;
-        int i = 0;
-        for(; i < input.length()-3; i++){
-            theflag += theflags.get(i);
-        }
-        for(; i > input.length();i++){
-            theflag += theflags1.get(i);
-        }
-
-        System.out.println(thefinalflag);
-
-    }
-    
     public static boolean check(String input){
         boolean h = false;
         String flag = "ow0_wh4t_4_h4ckr_y0u_4r3";
@@ -114,7 +63,6 @@ public class tough
             }
         }
 
-
         return thefinalflag.equals("ì¨ ¢«¢¥Ç©© ÂëÏãÒËãhÔÊ");
     }
     public static void createMap(HashMap owo, String input, boolean uwu){
@@ -138,7 +86,7 @@ public class tough
         String theflag = "";
 
         for (int i = 0; i < flagToReverse.length; i++) {
-            if (flagToReverse[i] > 155 && flagToReverse[i] < 167) {
+            if (flagToReverse[i] > 156 && flagToReverse[i] < 167) {
                 thefinalflag += (char)(flagToReverse[i]-10);
             } else {
                 thefinalflag += (char)(flagToReverse[i]);
@@ -153,22 +101,22 @@ public class tough
         for (int i = theflag.length()-4; i >= 0; i--) {
             theflags.put(i, theflag.charAt(i));
         }
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < theflag.length(); i++) {
             if (realflag[i] < 21) {
                 actualflag[i] = theflags.get(realflag[i]);
             }
         }
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < theflag.length(); i++) {
             if (therealflag[i] > 20) {
                 actualflag[i] = theflags1.get(therealflag[i]);
             }
         }
 
-        actualflag[actualflag.length-2] = 'o';
         actualflag[2] = 'r';
         actualflag[3] = '3';
         actualflag[5] = '_';
         actualflag[7] = '_';
+        actualflag[actualflag.length-2] = 'o';
 
         return (new String(actualflag));
     }
