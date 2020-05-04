@@ -44,7 +44,6 @@ def catcheckpass():
                             if userinput[19:22] == "_sE":
                                 if userinput[22:25] == "cuR":
                                     if userinput [25:27] == "3}":
-
                                         return True
   else:
     return False
